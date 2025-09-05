@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===========================
+   Warbuoy — Global Base (Black & Blue only)
+   =========================== */
+:root {
+  --wb-black: #0a0a0a;
+  --wb-text:  #ffffff;
+
+  /* brand blues */
+  --wb-blue-900: #0b1a3b;  /* optional deep bg accents */
+  --wb-blue-700: #1d4ed8;  /* dark primary */
+  --wb-blue-500: #0a84ff;  /* core brand */
+  --wb-blue-400: #60a5fa;  /* light accent */
+  --wb-blue-300: #93c5fd;  /* softer accent */
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--wb-black);
+  color: var(--wb-text);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;            /* natural free scroll */
+  scrollbar-gutter: stable both-edges;
+}
+
+* { outline: none; }
+a { color: inherit; text-decoration: none; }
+img, svg, video, canvas { display: block; max-width: 100%; height: auto; }
+
+/* Headings: tight tracking, heavy */
+h1, h2, h3, h4 { letter-spacing: -0.02em; font-weight: 800; }
+
+/* Text selection */
+::selection { background: var(--wb-blue-500); color: #fff; }
+
+/* iOS safe-area (optional) */
+@supports (padding: max(0px)) {
+  body { padding-bottom: max(0px, env(safe-area-inset-bottom)); }
+}
+
+/* ===========================
+   Scrollbars
+   =========================== */
+/* Chrome/Safari/Edge */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--wb-black); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, var(--wb-blue-500), var(--wb-blue-700));
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, var(--wb-blue-700), var(--wb-blue-500));
+}
+/* Firefox */
+* { scrollbar-width: thin; scrollbar-color: var(--wb-blue-500) var(--wb-black); }
+
+/* ===========================
+   Motion Safety
+   =========================== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===========================
+   Film Grain (add /public/noise.png)
+   =========================== */
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  background-image:url("/noise.png");
+  background-size: 200px 200px;
+  opacity:.05;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ===========================
+   Utilities (Tailwind-friendly)
+   =========================== */
+@layer utilities {
+  /* Premium glow for CTAs */
+  .shadow-glow { box-shadow: 0 0 28px rgba(10, 132, 255, 0.7); }
+
+  /* Glass card */
+  .glass { @apply bg-white/5 backdrop-blur-md border border-white/10; }
+
+  /* Pill chip */
+  .pill { @apply inline-flex items-center rounded-full px-4 py-2 border border-white/10 bg-white/5 text-gray-200; }
+
+  /* Blue-only gradient text */
+  .text-gradient {
+    background-image: linear-gradient(90deg, var(--wb-blue-400), var(--wb-blue-500), var(--wb-blue-300));
+    background-size: 200% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+  }
+
+  /* Shimmer (animate via bg-position) — blue-only */
+  .shimmer {
+    background-image: linear-gradient(90deg, var(--wb-blue-400), var(--wb-blue-500), var(--wb-blue-300));
+    background-size: 200% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+  }
+
+  /* Blue underline bar for accents */
+  .wb-underline {
+    background-image: linear-gradient(90deg, var(--wb-blue-500), var(--wb-blue-400), var(--wb-blue-300));
+  }
+
+  /* Edge fades (for marquees/overflow rows) */
+  .edge-fade-left  { mask-image: linear-gradient(to right, transparent, black 40%); }
+  .edge-fade-right { mask-image: linear-gradient(to left,  transparent, black 40%); }
+}
+
+/* ===========================
+   Marquee Core
+   =========================== */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marquee var(--duration, 18s) linear infinite;
+}
+.marquee-seq { display: flex; align-items: center; }
+.marquee-reverse { animation-direction: reverse; }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Optional shimmer driver for backgrounds */
+@keyframes bg-pan {
+  from { background-position: 0% center; }
+  to   { background-position: 200% center; }
+}
+
+/* ===========================
+   Subtle Animated Grid (for DynamicBackground)
+   =========================== */
+.animated-grid {
+  /* white grid lines, subtle over black; feels blue due to bg lighting */
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.28) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.28) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.08;
+  mix-blend-mode: screen;
+  animation: grid-shift 12s linear infinite;
+}
+
+@keyframes grid-shift {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 48px 48px, 48px 48px; }
+}
