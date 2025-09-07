@@ -19,6 +19,7 @@
     "framer-motion": "^11.0.0",
     "gsap": "^3.12.5",
     "next": "15.5.2",
+    "nodemailer": "^7.0.6",
     "postcss": "^8.4.24",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.4.2",
+    "@types/nodemailer": "^7.0.1",
     "@types/react": "^18.2.6",
     "@types/react-dom": "^18.2.4",
     "eslint": "^8.52.0",

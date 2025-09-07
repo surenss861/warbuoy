@@ -29,7 +29,7 @@ export default function Contact() {
     if (status === "ok") setModalOpen(true);
   }, [status]);
 
-  // close on ESC
+  // Close modal on ESC
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setModalOpen(false);
     window.addEventListener("keydown", onKey);
@@ -38,10 +38,14 @@ export default function Contact() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    // ✅ Capture the form element BEFORE any await (fixes "reset of null")
+    const form = e.currentTarget;
+
     setError(null);
     setStatus("sending");
 
-    const fd = new FormData(e.currentTarget);
+    const fd = new FormData(form);
     const data: Payload = {
       name: (fd.get("name") as string)?.trim(),
       email: (fd.get("email") as string)?.trim(),
@@ -53,6 +57,7 @@ export default function Contact() {
       hp: (fd.get("hp") as string) || "",
     };
 
+    // Client validation
     if (!data.name || !data.email || !data.message) {
       setStatus("error");
       setError("Name, email, and a short message are required.");
@@ -78,7 +83,7 @@ export default function Contact() {
 
       setSubmittedEmail(data.email);
       setStatus("ok");
-      (e.currentTarget as HTMLFormElement).reset();
+      form.reset(); // ✅ safe because we saved the ref synchronously
     } catch (err: any) {
       setStatus("error");
       setError(err?.message || "Failed to send. Try again.");
@@ -137,52 +142,40 @@ export default function Contact() {
           </div>
 
           {/* Right: form */}
-          <form onSubmit={onSubmit} className="md:col-span-3 glass rounded-2xl p-6 md:p-8">
+          <form onSubmit={onSubmit} className="md:col-span-3 glass rounded-2xl p-6 md:p-8" noValidate>
             {/* honeypot */}
             <input type="text" name="hp" className="hidden" tabIndex={-1} autoComplete="off" />
 
             <div className="grid gap-5 md:grid-cols-2">
               <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true }}>
-                <label className={label} htmlFor="name">
-                  Full name *
-                </label>
+                <label className={label} htmlFor="name">Full name *</label>
                 <input id="name" name="name" className={field} placeholder="Suren Warbuoy" required />
               </motion.div>
 
               <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-40px" }}>
-                <label className={label} htmlFor="email">
-                  Email *
-                </label>
+                <label className={label} htmlFor="email">Email *</label>
                 <input id="email" name="email" type="email" className={field} placeholder="you@brand.com" required />
               </motion.div>
             </div>
 
             <div className="mt-5 grid gap-5 md:grid-cols-2">
               <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true }}>
-                <label className={label} htmlFor="company">
-                  Company / Brand
-                </label>
+                <label className={label} htmlFor="company">Company / Brand</label>
                 <input id="company" name="company" className={field} placeholder="Warbuoy Ventures" />
               </motion.div>
               <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true }}>
-                <label className={label} htmlFor="website">
-                  Website
-                </label>
+                <label className={label} htmlFor="website">Website</label>
                 <input id="website" name="website" className={field} placeholder="https://yourbrand.com" />
               </motion.div>
             </div>
 
             <div className="mt-5 grid gap-5 md:grid-cols-2">
               <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true }}>
-                <label className={label} htmlFor="budget">
-                  Monthly budget
-                </label>
+                <label className={label} htmlFor="budget">Monthly budget</label>
                 <select id="budget" name="budget" className={cn(field, "bg-white/5")}>
                   <option value="" className="bg-[#0a0a0a]">Select</option>
                   {budgets.map((b) => (
-                    <option key={b} value={b} className="bg-[#0a0a0a]">
-                      {b}
-                    </option>
+                    <option key={b} value={b} className="bg-[#0a0a0a]">{b}</option>
                   ))}
                 </select>
               </motion.div>
@@ -219,13 +212,14 @@ export default function Contact() {
                 type="submit"
                 size="lg"
                 className={cn("px-6", status === "sending" && "opacity-70 pointer-events-none")}
+                aria-busy={status === "sending"}
+                aria-live="polite"
               >
                 {status === "sending" ? "Sending…" : "Send message"}
               </Button>
             </div>
 
-            {/* status fallback text */}
-            <div className="mt-4 min-h-[22px]">
+            <div className="mt-4 min-h-[22px]" aria-live="polite" role="status">
               {status === "error" && error && <p className="text-sm text-red-400">{error}</p>}
             </div>
           </form>
@@ -241,6 +235,7 @@ export default function Contact() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
+            {/* overlay */}
             <motion.button
               aria-label="Close"
               onClick={() => setModalOpen(false)}
@@ -249,6 +244,7 @@ export default function Contact() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             />
+            {/* dialog */}
             <motion.div
               role="dialog"
               aria-modal="true"
@@ -284,7 +280,7 @@ export default function Contact() {
   );
 }
 
-/* changed value type to React.ReactNode so we can pass a link */
+/** Allows passing a link/component as the value */
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between border-b border-white/10 pb-3">
